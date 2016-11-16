@@ -1,4 +1,4 @@
-import "source-map-support/register";
 import { teste } from "shared/test";
+import "./application.scss";
 
 teste();

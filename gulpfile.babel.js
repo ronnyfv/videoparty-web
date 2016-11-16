@@ -13,6 +13,14 @@ gulp.task('clean', gulp.parallel('clean:server', 'clean:client'));
 
 
 gulp.task('dev:server', gulp.series('clean:server', devServerBuild));
+gulp.task('dev', gulp
+  .series(
+    'clean',
+    devServerBuild,
+    gulp.parallel(
+      devServerWatch,
+      devServerReload)));
+
 gulp.task('prod:server', gulp.series('clean:server', prodServerBuild));
 
 
@@ -36,10 +44,10 @@ function devServerWatch() {
 function devServerReload() {
   return $.nodemon({
     script: './build/server.js',
-    watch: './build',
+    watch: './build/',
     env: {
       'NODE_ENV': 'development',
-      'USER_WEBPACK': 'true'
+      'USE_WEBPACK': 'true'
     }
   });
 }
