@@ -2,22 +2,29 @@ let path = require("path");
 let dirname = path.resolve("./");
 let webpack = require("webpack");
 
-// 'jquery'
-let vendorModules = [];
+let vendorModules = ['jquery'];
 
 function createConfig(isDebug) {
   let devtool = isDebug ? 'eval-source-map' : 'source-map';
-  let plugins = [new webpack.optimize.CommonsChunkPlugin('vendor', 'vendor.js')];
+  let plugins = [
+    new webpack.optimize.CommonsChunkPlugin("vendor", "vendor.js")
+  ];
 
   let cssLoader = { test: /\.css$/, loader: 'style!css' };
   let sassLoader = { test: /\.scss$/, loader: 'style!css!sass' };
   let appEntry = ['./src/client/application.js'];
 
+  if (!isDebug) {
+    plugins.push(new webpack.optimize.UglifyJsPlugin());
+  }
+
+  console.log(plugins);
+
   return {
     devtool: devtool,
     entry: {
-      vendor: vendorModules,
-      application: appEntry
+      application: appEntry,
+      vendor: vendorModules
     },
     output: {
       path: path.join(dirname, 'public', 'build'),
@@ -37,7 +44,6 @@ function createConfig(isDebug) {
         cssLoader,
         sassLoader
       ],
-      externals: [],
       plugins: plugins
     }
   };
