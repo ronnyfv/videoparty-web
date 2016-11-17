@@ -4,6 +4,9 @@ export class ObservableSocket {
   constructor(socket) {
     this._socket = socket;
     this._state = {};
+    this._actionCallbacks = {};
+    this._requests = {};
+    this._nextRequestId = 0;
 
     this.status$ = Observable.merge(
       this.on$('connect').map(() => ({ isConnected: true })),
@@ -27,9 +30,7 @@ export class ObservableSocket {
     return !this.isConnected && !this.isReconnecting;
   }
 
-  /**
-   * basic wrappers
-   */
+  // BASIC WRAPPERS
   on$(event) {
     return Observable.fromEvent(this._socket, event);
   }
@@ -44,5 +45,21 @@ export class ObservableSocket {
 
   emit(event, arg) {
     this._socket.emit(event, arg);
+  }
+
+  // EMIT CLIENT-SIDE
+  emitAction$(action, arg) {
+    return Observable.empty();
+  }
+
+  _registerCallbacks(action) {
+
+  }
+
+  // ON SERVER-SIDE
+  onAction(action, callback) {
+    this._socket.on(action, (...args) => {
+      console.log(args);
+    });
   }
 }
