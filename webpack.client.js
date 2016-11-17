@@ -1,6 +1,7 @@
 let path = require("path");
 let dirname = path.resolve("./");
 let webpack = require("webpack");
+let ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 let vendorModules = ['jquery'];
 
@@ -16,9 +17,14 @@ function createConfig(isDebug) {
 
   if (!isDebug) {
     plugins.push(new webpack.optimize.UglifyJsPlugin());
-  }
+    plugins.push(new ExtractTextPlugin('[name].css'));
 
-  console.log(plugins);
+    cssLoader.loader = ExtractTextPlugin.extract('style', 'css');
+    sassLoader.loader = ExtractTextPlugin.extract('style', 'css!sass');
+  } else {
+    plugins.push(new webpack.HotModuleReplacementPlugin());
+    appEntry.splice(0,0, 'webpack-hot-middleware/client');
+  }
 
   return {
     devtool: devtool,
@@ -29,11 +35,11 @@ function createConfig(isDebug) {
     output: {
       path: path.join(dirname, 'public', 'build'),
       filename: '[name].js',
-      public: '/build/'
+      publicPath: '/build/'
     },
     resolve: {
       alias: {
-        shared: path.join(__dirname, 'src', 'shared')
+        shared: path.join(dirname, 'src', 'shared')
       }
     },
     module: {
@@ -43,9 +49,9 @@ function createConfig(isDebug) {
         { test: /\.(png|jpg|gif|jpeg|ttf|eot|svg|woff2|woff)/, loader: 'url-loader?limit=512' },
         cssLoader,
         sassLoader
-      ],
-      plugins: plugins
-    }
+      ]
+    },
+    plugins: plugins
   };
 }
 
