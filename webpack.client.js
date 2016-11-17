@@ -3,7 +3,7 @@ let dirname = path.resolve("./");
 let webpack = require("webpack");
 let ExtractTextPlugin = require("extract-text-webpack-plugin");
 
-let vendorModules = ['jquery'];
+let vendorModules = ['jquery', 'lodash', 'socket.io-client', 'rxjs'];
 
 function createConfig(isDebug) {
   let devtool = isDebug ? 'eval-source-map' : 'source-map';
