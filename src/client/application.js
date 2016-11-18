@@ -14,18 +14,20 @@ services.server.status$
   .subscribe(status => console.log(status));
 
 services.server.emitAction$('login', { username: 'foo', password: 'bar' })
-  .subscribe(result => {
-    if (result.error)
-      console.log(result.error);
-    else
-      console.log('Logged In!');
+  .subscribe(user => {
+    console.log('Logged In! ' + user);
+  }, error => {
+    console.error(error);
   });
 
 // AUTH
 
 
 // COMPONENTS
-
+require("./components/player/player");
+require("./components/users/users");
+require("./components/chat/chat");
+require("./components/playlist/playlist");
 
 // BOOTSTRAP
 services.socket.connect();

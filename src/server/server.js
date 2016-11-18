@@ -6,6 +6,10 @@ import chalk from "chalk";
 import { Observable } from "rxjs";
 import { ObservableSocket } from "shared/observable-socket";
 
+import { UsersModule } from "./modules/users";
+import { PlaylistModule } from "./modules/playlist";
+import { ChatModule } from "./modules/chat";
+
 // **************************************************
 // HELPERS
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -60,8 +64,17 @@ app.get('/', (req, res) => {
 
 
 // **************************************************
-// MODULES
+// SERVICES
+const videoServices = [];
+const playlistRepository = {};
 
+// **************************************************
+// MODULES
+const users = new UsersModule(io);
+const chat = new ChatModule(io, users);
+const playlist = new PlaylistModule(io, users, playlistRepository, videoServices);
+
+const modules = [users, chat, playlist];
 
 // **************************************************
 // SOCKET
@@ -69,14 +82,19 @@ io.on('connection', socket => {
   console.log(`Got connection from ${socket.request.connection.remoteAddress}`);
 
   const client = new ObservableSocket(socket);
+
+  for (let mod of modules) {
+    mod.registerClient(client);
+  }
+
+  for (let mod of modules) {
+    mod.clientRegistered(client);
+  }
+
   client.onAction('login', credentials => {
-    return Observable.of({ username: credentials.username });
+    return Observable.of(`User: ${credentials.username}`).delay(3000);
   });
 
-  // let index = 0;
-  // setInterval(() => {
-  //   socket.emit('test', `On index ${index++}`);
-  // }, 5000);
 });
 
 // **************************************************
@@ -89,4 +107,12 @@ function startServer() {
   });
 }
 
-startServer();
+Observable.merge(...modules.map(m => m.init$()))
+  .subscribe({
+    complete(){
+      startServer();
+    },
+    error(error){
+      console.error(`Could not init module: ${error.stack || error}`);
+    }
+  });
