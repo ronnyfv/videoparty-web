@@ -1,7 +1,13 @@
 import $ from "jquery";
+import { Observable } from "rxjs";
+
+Observable.prototype.compSubscribe = function (component, ...args) {
+  let subscription = this.subscribe(...args);
+  component._onDetachHandlers.push(() => subscription.unsubscribe());
+  return subscription;
+};
 
 export class ComponentBase {
-
   attach($mount) {
     this._$mount = $mount;
     this._onDetachHandlers = [];
@@ -44,18 +50,18 @@ export class ElementComponent extends ComponentBase {
     this._$element = $(`<${elementType}>`).data('component', this);
   }
 
-  attach($mount){
+  attach($mount) {
     super.attach($mount);
     this.$element.appendTo(this._$mount);
   }
 
-  detach(){
+  detach() {
     super.detach();
     this.$element.remove();
   }
 
   _setClass(className, isOn) {
-    if(isOn)
+    if (isOn)
       this._$element.addClass(className);
     else
       this._$element.removeClass(className);

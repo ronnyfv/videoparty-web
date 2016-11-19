@@ -6,9 +6,9 @@ export class UsersModule extends ModuleBase {
     super();
     this._io = io;
     this._userList = [
-      {name: 'Foo', color: this.getColorForUsername('Foo')},
-      {name: 'Bar', color: this.getColorForUsername('Bar')},
-      {name: 'Doo', color: this.getColorForUsername('Doo')}
+      { name: 'Foo', color: this.getColorForUsername('Foo') },
+      { name: 'Bar', color: this.getColorForUsername('Bar') },
+      { name: 'Doo', color: this.getColorForUsername('Doo') }
     ];
   }
 
@@ -24,7 +24,27 @@ export class UsersModule extends ModuleBase {
     return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
   }
 
-  registerClient(client){
+  registerClient(client) {
+    let index = 0;
+    setInterval(() => {
+      const username = `new user ${index++}`;
+      const user = {name: username, color: this.getColorForUsername(username)};
+      client.emit('users:added', user);
+    }, 4000);
 
+
+    client.onActions({
+      'users:list': () => {
+        return this._userList;
+      },
+
+      'auth:login': () => {
+
+      },
+
+      'auth:logout': () => {
+
+      }
+    });
   }
 }
