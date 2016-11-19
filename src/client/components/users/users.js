@@ -19,8 +19,6 @@ class UsersComponent extends ElementComponent {
     this._users.state$
       .map(action => action.state.users)
       .compSubscribe(this, users => {
-        console.log('got new state');
-
         if (users.length != 1)
           $title.text(`${users.length} users`);
         else

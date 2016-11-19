@@ -1,6 +1,7 @@
-import "./application.scss";
-
+import "shared/operators";
 import * as services from "./services";
+
+import "./application.scss";
 
 // PLAYGOUND
 
@@ -10,15 +11,14 @@ import * as services from "./services";
 //     console.log('got ' + item);
 //   });
 
-services.server.status$
-  .subscribe(status => console.log(status));
+services.server.status$.subscribe(status => console.log(status));
 
-services.server.emitAction$('login', { username: 'foo', password: 'bar' })
-  .subscribe(user => {
-    console.log('Logged In! ' + user);
-  }, error => {
-    console.error(error);
-  });
+// services.server.emitAction$('login', { username: 'foo', password: 'bar' })
+//   .subscribe(user => {
+//     console.log('Logged In! ' + user);
+//   }, error => {
+//     console.error(error);
+//   });
 
 // AUTH
 
@@ -32,6 +32,7 @@ require("./components/playlist/playlist");
 // BOOTSTRAP
 services.socket.connect();
 
-// services.usersStore.state$.subscribe(state => {
-//   console.log(state);
-// });
+services.usersStore.login$('whoa')
+  .subscribe(user => {
+    console.log(user);
+  });
